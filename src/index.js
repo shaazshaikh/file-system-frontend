@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 function MyFirstFunction() {
-  return <h2>My first component</h2>;
+  return <h2>My first component - updated</h2>;
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
