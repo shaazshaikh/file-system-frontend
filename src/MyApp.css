@@ -1,0 +1,26 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: rgba(101, 100, 100, 0.945);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+}
+
+.button-container {
+  margin-top: 20px;
+}
+
+.login-button {
+  background-color: #2d38d5;
+  color: white;
+}
+
+.signup-button {
+  background-color: #2d38d5;
+  color: white;
+}
