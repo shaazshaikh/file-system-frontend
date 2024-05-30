@@ -7,7 +7,7 @@ function MyAppFunction() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>File system project</h1>
+        <h1>File system project </h1>
         <div className="form-container">
           {showLoginPage ? (
             <div className="login-form">
