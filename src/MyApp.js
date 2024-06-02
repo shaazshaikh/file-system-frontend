@@ -10,7 +10,41 @@ function MyAppFunction() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
 
+  const validateLoginForm = () => {
+    const errors = {};
+    if (!userName) {
+      errors.userName = "username is required";
+    }
+    if (!password) {
+      errors.password = "password is required";
+    }
+    return errors;
+  };
+
+  const validateSignUpForm = () => {
+    const errors = {};
+    if (!userName) {
+      errors.userName = "username is required";
+    }
+    if (!password) {
+      errors.password = "password is required";
+    }
+    if (!confirmPassword) {
+      errors.confirmPassword = "confirmPassword is required";
+    }
+    if (password !== confirmPassword) {
+      errors.confirmPassword = "password and confirm password should match";
+    }
+    return errors;
+  };
+
   const Login = async () => {
+    const validationErrors = validateLoginForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors({});
     try {
       const response = await axios.post(
         "https://localhost:7279/api/login/authenticateUser",
@@ -25,7 +59,13 @@ function MyAppFunction() {
   };
 
   const SignUp = async () => {
+    const validationErrors = validateSignUpForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
     try {
+      setErrors({});
       const response = await axios.post(
         "https://localhost:7279/api/signUp/signUp",
         {
@@ -33,6 +73,10 @@ function MyAppFunction() {
           password,
         }
       );
+      if (response.status === 201) {
+        alert("Account Created");
+        handleSwitchToLogin();
+      }
     } catch (error) {
       // To be handled later
     }
@@ -41,12 +85,15 @@ function MyAppFunction() {
   const handleSwitchToSignUp = () => {
     setUserName("");
     setPassword("");
+    setErrors({});
     setShowLoginPage(false);
   };
 
   const handleSwitchToLogin = () => {
     setUserName("");
     setPassword("");
+    setConfirmPassword("");
+    setErrors({});
     setShowLoginPage(true);
   };
 
@@ -65,6 +112,9 @@ function MyAppFunction() {
                   setUserName(e.target.value);
                 }}
               />
+              {errors.userName ? (
+                <p className="error">{errors.userName}</p>
+              ) : null}
               <input
                 type="password"
                 placeholder="Password"
@@ -73,6 +123,9 @@ function MyAppFunction() {
                   setPassword(e.target.value);
                 }}
               />
+              {errors.password ? (
+                <p className="error">{errors.password}</p>
+              ) : null}
               <button className="login-button" onClick={Login}>
                 Login
               </button>
@@ -96,6 +149,9 @@ function MyAppFunction() {
                   setUserName(e.target.value);
                 }}
               />
+              {errors.userName ? (
+                <p className="error">{errors.userName}</p>
+              ) : null}
               <input
                 type="password"
                 placeholder="Password"
@@ -104,6 +160,9 @@ function MyAppFunction() {
                   setPassword(e.target.value);
                 }}
               />
+              {errors.password ? (
+                <p className="error">{errors.password}</p>
+              ) : null}
               <input
                 type="password"
                 placeholder="Confirm Password"
@@ -112,6 +171,9 @@ function MyAppFunction() {
                   setConfirmPassword(e.target.value);
                 }}
               />
+              {errors.confirmPassword ? (
+                <p className="error">{errors.confirmPassword}</p>
+              ) : null}
               <button className="signup-button" onClick={SignUp}>
                 Sign Up
               </button>
