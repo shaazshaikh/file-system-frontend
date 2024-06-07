@@ -2,6 +2,7 @@ import axios from "axios";
 import React from "react";
 import { useState } from "react";
 import "./MyApp.css";
+import { useNavigate } from "react-router-dom";
 
 function MyAppFunction() {
   const [showLoginPage, setShowLoginPage] = useState(true);
@@ -9,6 +10,7 @@ function MyAppFunction() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const validateLoginForm = () => {
     const errors = {};
@@ -53,6 +55,11 @@ function MyAppFunction() {
           password,
         }
       );
+      const token = response.data;
+      if (token) {
+        localStorage.setItem("jwtToken", token);
+        navigate("/Home");
+      }
     } catch (error) {
       // To be handled later
     }

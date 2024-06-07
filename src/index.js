@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
-import MyApp from "./MyApp";
+import AppRouter from "./router";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<MyApp />);
+root.render(<AppRouter />);
