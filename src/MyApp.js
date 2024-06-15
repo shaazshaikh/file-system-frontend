@@ -58,7 +58,7 @@ function MyAppFunction() {
       const token = response.data;
       if (token) {
         localStorage.setItem("jwtToken", token);
-        navigate("/Home");
+        navigate("/components/Home");
       }
     } catch (error) {
       // To be handled later

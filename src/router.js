@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MyAppFunction from "./MyApp";
-import Home from "./Home";
+import Home from "./components/Home";
 
 const router = createBrowserRouter([
   {
@@ -8,7 +8,7 @@ const router = createBrowserRouter([
     element: <MyAppFunction />,
   },
   {
-    path: "/Home",
+    path: "/components/Home",
     element: <Home />,
   },
 ]);
