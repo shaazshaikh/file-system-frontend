@@ -49,7 +49,7 @@ function MyAppFunction() {
     setErrors({});
     try {
       const response = await axios.post(
-        "https://localhost:7279/api/login/authenticateUser",
+        "https://filesystemauthentication.azurewebsites.net/api/login/authenticateUser",
         {
           userName,
           password,
@@ -74,7 +74,7 @@ function MyAppFunction() {
     try {
       setErrors({});
       const response = await axios.post(
-        "https://localhost:7279/api/signUp/signUp",
+        "https://filesystemauthentication.azurewebsites.net/api/signUp/signUp",
         {
           userName,
           password,
