@@ -64,13 +64,33 @@
 
 .top-right-icons {
   display: flex;
-  align-items: center;
+  justify-content: center; /* Center the text horizontally */
+  align-items: center; /* Center the text vertically */
 }
 
-.top-right-icons .settings-icon,
-.top-right-icons .profile-icon {
-  margin-left: 20px;
+.settings-icon {
+  display: flex;
+  justify-content: center; /* Center the text horizontally */
+  align-items: center;
   cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  font-size: x-large;
+  margin: 5px;
+}
+
+.profile-icon {
+  display: flex;
+  justify-content: center; /* Center the text horizontally */
+  align-items: center;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  color: rgb(255, 255, 255);
+  background-color: #93c8ec;
+  margin: 5px;
 }
 
 .files-folders-table {
