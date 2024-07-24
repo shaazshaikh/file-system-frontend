@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MyAppFunction from "./MyApp";
 import Home from "./components/Home";
+import FileUploadAndFetch from "./components/FileUploadAndFetch";
 
 const router = createBrowserRouter([
   {
@@ -9,7 +10,8 @@ const router = createBrowserRouter([
   },
   {
     path: "/components/Home",
-    element: <Home />,
+    element: <FileUploadAndFetch />,
+    // element: <Home />,
   },
 ]);
 
