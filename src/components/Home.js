@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { UserContext } from "../context/userContext";
 import "../css/Home.css";
 
 function Home() {
   const [viewType, setViewType] = useState("All");
+  const { user } = useContext(UserContext);
 
   const files = [
     { name: "File1.txt", modified: "2024-06-01", type: "File", size: "15KB" },
@@ -48,7 +50,7 @@ function Home() {
           </div>
           <div className="top-right-icons">
             <div className="settings-icon">⚙️</div>
-            <div className="profile-icon">S</div>
+            <div className="profile-icon">{user[0].toUpperCase()}</div>
           </div>
         </div>
         <table className="files-folders-table">

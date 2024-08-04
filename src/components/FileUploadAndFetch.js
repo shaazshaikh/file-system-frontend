@@ -9,8 +9,12 @@ function FileUploadAndFetch() {
   };
 
   const getFiles = () => {
+    const jwtToken = localStorage.getItem("jwtToken");
     fetch("https://localhost:7082/api/fileupload/getFiles", {
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
     })
       .then((response) => {
         if (response.ok) {
@@ -25,6 +29,7 @@ function FileUploadAndFetch() {
   };
 
   const uploadFile = () => {
+    const jwtToken = localStorage.getItem("jwtToken");
     if (fileSelected) {
       console.log("ok");
       const formData = new FormData();
@@ -32,6 +37,9 @@ function FileUploadAndFetch() {
 
       fetch("https://localhost:7082/api/fileupload/uploadFiles", {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
         body: formData,
       })
         .then((response) => {

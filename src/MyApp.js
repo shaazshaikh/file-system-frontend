@@ -1,8 +1,9 @@
 import axios from "axios";
-import React from "react";
+import React, { useContext } from "react";
 import { useState } from "react";
 import "./MyApp.css";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "./context/userContext";
 
 function MyAppFunction() {
   const [showLoginPage, setShowLoginPage] = useState(true);
@@ -11,6 +12,7 @@ function MyAppFunction() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
 
   const validateLoginForm = () => {
     const errors = {};
@@ -59,6 +61,7 @@ function MyAppFunction() {
       const token = response.data;
       if (token) {
         localStorage.setItem("jwtToken", token);
+        setUser(userName);
         navigate("/components/Home");
       }
     } catch (error) {
