@@ -11,8 +11,8 @@ const router = createBrowserRouter([
   },
   {
     path: "/components/Home",
-    element: <FileUploadAndFetch />,
-    // element: <Home />,
+    // element: <FileUploadAndFetch />,
+    element: <Home />,
   },
 ]);
 

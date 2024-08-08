@@ -1,10 +1,19 @@
 import React, { useState, useContext } from "react";
 import { UserContext } from "../context/userContext";
 import "../css/Home.css";
+import { Modal, Button, Form } from "react-bootstrap";
+import { getFiles, uploadFile } from "../services/fileService";
 
 function Home() {
   const [viewType, setViewType] = useState("All");
   const { user } = useContext(UserContext);
+  const [currentFolder, setCurrentFolder] = useState("HomeFolder");
+  const [newFolder, setNewFolder] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [isFolderCreation, setIsFolderCreation] = useState(false);
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [filesFetched, setFilesFetched] = useState([]);
+  const [fileSelected, setFileSelected] = useState(null);
 
   const files = [
     { name: "File1.txt", modified: "2024-06-01", type: "File", size: "15KB" },
@@ -16,6 +25,47 @@ function Home() {
   const filteredFiles =
     viewType === "All" ? files : files.filter((file) => file.type === viewType);
 
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
+  const handleNewFolder = () => {
+    setIsCreatingFolder(true);
+    setFileSelected(null);
+    handleShowModal();
+  };
+
+  const handleUploadFile = () => {
+    setIsCreatingFolder(false);
+    handleShowModal();
+  };
+
+  const createNewFolder = () => {
+    if (newFolder) {
+      const newFolderPath = `${currentFolder}/${newFolder}`;
+      // call api to create new folder
+      setNewFolder("");
+      handleCloseModal();
+    } else {
+      alert("Enter folder name");
+    }
+  };
+
+  const callUploadFile = async () => {
+    const data = await uploadFile(fileSelected, currentFolder);
+    if (data === null) {
+      alert("Could not upload file");
+    }
+    handleCloseModal();
+  };
+
+  const callGetFiles = async () => {
+    const data = await getFiles();
+    setFilesFetched(data);
+  };
+
+  const fileChange = (event) => {
+    setFileSelected(event.target.files[0]);
+  };
   return (
     <div className="home-container">
       <div className="sidebar">
@@ -27,7 +77,14 @@ function Home() {
       </div>
       <div className="main-content">
         <div className="top-bar">
-          <button className="new-button">+ New</button>
+          <button className="new-button">+ New Folder</button>
+          <input
+            type="text"
+            value={newFolder}
+            onChange={(e) => setNewFolder(e.target.value)}
+            placeholder="Enter new folder name"
+          />
+
           <div className="view-toggle">
             <button
               className={viewType === "All" ? "active" : ""}
