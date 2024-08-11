@@ -20,6 +20,7 @@ export const uploadFile = async (fileSelected, folderPath) => {
   if (fileSelected) {
     const formData = new FormData();
     formData.append("file", fileSelected);
+    formData.append("folder", folderPath);
 
     const data = await fetch(
       "https://localhost:7082/api/fileupload/uploadFiles",

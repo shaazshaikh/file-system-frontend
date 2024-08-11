@@ -10,7 +10,7 @@ function Home() {
   const [currentFolder, setCurrentFolder] = useState("HomeFolder");
   const [newFolder, setNewFolder] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [isFolderCreation, setIsFolderCreation] = useState(false);
+  // const [isFolderCreation, setIsFolderCreation] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [filesFetched, setFilesFetched] = useState([]);
   const [fileSelected, setFileSelected] = useState(null);
@@ -25,18 +25,18 @@ function Home() {
   const filteredFiles =
     viewType === "All" ? files : files.filter((file) => file.type === viewType);
 
-  const handleShowModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
+  const CallShowModal = () => setShowModal(true);
+  const CallCloseModal = () => setShowModal(false);
 
   const handleNewFolder = () => {
     setIsCreatingFolder(true);
     setFileSelected(null);
-    handleShowModal();
+    CallShowModal();
   };
 
   const handleUploadFile = () => {
     setIsCreatingFolder(false);
-    handleShowModal();
+    CallShowModal();
   };
 
   const createNewFolder = () => {
@@ -44,7 +44,7 @@ function Home() {
       const newFolderPath = `${currentFolder}/${newFolder}`;
       // call api to create new folder
       setNewFolder("");
-      handleCloseModal();
+      CallCloseModal();
     } else {
       alert("Enter folder name");
     }
@@ -55,7 +55,7 @@ function Home() {
     if (data === null) {
       alert("Could not upload file");
     }
-    handleCloseModal();
+    CallCloseModal();
   };
 
   const callGetFiles = async () => {
@@ -77,13 +77,18 @@ function Home() {
       </div>
       <div className="main-content">
         <div className="top-bar">
-          <button className="new-button">+ New Folder</button>
-          <input
+          <button className="new-button" onClick={handleNewFolder}>
+            + New Folder
+          </button>
+          <button className="new-button" onClick={handleUploadFile}>
+            + Upload FIle
+          </button>
+          {/* <input
             type="text"
             value={newFolder}
             onChange={(e) => setNewFolder(e.target.value)}
             placeholder="Enter new folder name"
-          />
+          /> */}
 
           <div className="view-toggle">
             <button
@@ -135,6 +140,47 @@ function Home() {
           </tbody>
         </table>
       </div>
+
+      <Modal show={showModal} onHide={CallCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {isCreatingFolder ? "Create New Folder" : "Upload File"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {isCreatingFolder ? (
+            <Form>
+              <Form.Group controlId="formFolderName">
+                <Form.Label>Folder Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={newFolder}
+                  onChange={(e) => setNewFolder(e.target.value)}
+                  placeholder="Enter folder name"
+                />
+              </Form.Group>
+            </Form>
+          ) : (
+            <Form>
+              <Form.Group controlId="formFileName">
+                <Form.Label>Upload File</Form.Label>
+                <Form.Control type="file" onChange={fileChange} />
+              </Form.Group>
+            </Form>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={CallCloseModal}>
+            Close
+          </Button>
+          <Button
+            variant="primary"
+            onClick={isCreatingFolder ? createNewFolder : callUploadFile}
+          >
+            {isCreatingFolder ? "Create Folder" : "Upload File"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
