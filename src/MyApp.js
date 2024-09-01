@@ -4,6 +4,7 @@ import { useState } from "react";
 import "./MyApp.css";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "./context/userContext";
+import { jwtDecode } from "jwt-decode";
 
 function MyAppFunction() {
   const [showLoginPage, setShowLoginPage] = useState(true);
@@ -61,7 +62,13 @@ function MyAppFunction() {
       const token = response.data;
       if (token) {
         localStorage.setItem("jwtToken", token);
-        setUser(userName);
+        const decodedToken = jwtDecode(token);
+        const username =
+          decodedToken[
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+          ];
+
+        setUser(username);
         navigate("/components/Home");
       }
     } catch (error) {

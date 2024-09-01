@@ -44,3 +44,48 @@ export const uploadFile = async (fileSelected, folderPath) => {
   }
   return null;
 };
+
+export const createFolder = async (
+  currentFolderId,
+  newFolderPath,
+  newFolder
+) => {
+  const jwtToken = localStorage.getItem("jwtToken");
+  const payload = {
+    parentFolderId: currentFolderId,
+    folderPath: newFolderPath,
+    folderName: newFolder,
+  };
+  const response = await fetch(
+    "https://localhost:7082/api/folder/createFolder",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      body: JSON.stringify(payload),
+    }
+  ).then((response) => {
+    return response;
+  });
+};
+
+export const getFolderDetails = async (home) => {
+  const jwtToken = localStorage.getItem("jwtToken");
+  const response = await fetch(
+    `https://localhost:7082/api/folder/getFolderDetails/${home}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }
+  );
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else {
+    throw new Error("Failed to get folder details");
+  }
+};

@@ -1,26 +1,39 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../context/userContext";
 import "../css/Home.css";
 import { Modal, Button, Form } from "react-bootstrap";
 import { getFiles, uploadFile } from "../services/fileService";
+import { createFolder, getFolderDetails } from "../services/fileService";
 
 function Home() {
   const [viewType, setViewType] = useState("All");
-  const { user } = useContext(UserContext);
-  const [currentFolder, setCurrentFolder] = useState("HomeFolder");
+  const { user, loading } = useContext(UserContext);
+  const [currentFolder, setCurrentFolder] = useState("home");
   const [newFolder, setNewFolder] = useState("");
   const [showModal, setShowModal] = useState(false);
   // const [isFolderCreation, setIsFolderCreation] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [filesFetched, setFilesFetched] = useState([]);
   const [fileSelected, setFileSelected] = useState(null);
+  const [currentFolderId, setCurrentFolderId] = useState(null);
 
-  const files = [
-    { name: "File1.txt", modified: "2024-06-01", type: "File", size: "15KB" },
-    { name: "Folder1", modified: "2024-06-02", type: "Folder", size: "15KB" },
-    { name: "File2.txt", modified: "2024-06-03", type: "File", size: "15KB" },
-    { name: "Folder2", modified: "2024-06-04", type: "Folder", size: "15KB" },
-  ];
+  // const files = [
+  //   { name: "File1.txt", modified: "2024-06-04", type: "File", size: "15KB" },
+  //   { name: "Folder1", modified: "2024-06-02", type: "Folder", size: "15KB" },
+  //   { name: "File2.txt", modified: "2024-06-03", type: "File", size: "15KB" },
+  //   { name: "Folder2", modified: "2024-06-01", type: "Folder", size: "15KB" },
+  // ];
+
+  useEffect(() => {
+    const getHomeFolderDetails = async () => {
+      const folderDetails = await getFolderDetails("home");
+      setCurrentFolderId(folderDetails.id);
+      setCurrentFolder(folderDetails.folderName);
+    };
+    getHomeFolderDetails();
+  }, []);
+
+  const files = [];
 
   const filteredFiles =
     viewType === "All" ? files : files.filter((file) => file.type === viewType);
@@ -42,7 +55,7 @@ function Home() {
   const createNewFolder = () => {
     if (newFolder) {
       const newFolderPath = `${currentFolder}/${newFolder}`;
-      // call api to create new folder
+      const data = createFolder(currentFolderId, newFolderPath, newFolder);
       setNewFolder("");
       CallCloseModal();
     } else {
@@ -81,7 +94,7 @@ function Home() {
             + New Folder
           </button>
           <button className="new-button" onClick={handleUploadFile}>
-            + Upload FIle
+            + Upload File
           </button>
           {/* <input
             type="text"
@@ -111,8 +124,12 @@ function Home() {
             </button>
           </div>
           <div className="top-right-icons">
-            <div className="settings-icon">⚙️</div>
-            <div className="profile-icon">{user[0].toUpperCase()}</div>
+            {!loading && user && (
+              <>
+                <div className="settings-icon">⚙️</div>
+                <div className="profile-icon">{user[0].toUpperCase()}</div>
+              </>
+            )}
           </div>
         </div>
         <table className="files-folders-table">
