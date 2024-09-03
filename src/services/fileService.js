@@ -56,11 +56,13 @@ export const createFolder = async (
     folderPath: newFolderPath,
     folderName: newFolder,
   };
+
   const response = await fetch(
     "https://localhost:7082/api/folder/createFolder",
     {
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${jwtToken}`,
       },
       body: JSON.stringify(payload),
