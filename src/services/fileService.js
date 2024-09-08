@@ -1,10 +1,13 @@
-export const getFiles = async () => {
+export const getFiles = async (currentFolder) => {
   const jwtToken = localStorage.getItem("jwtToken");
-  const data = await fetch("https://localhost:7082/api/fileupload/getFiles", {
-    method: "GET",
+  const payload = { folderPath: currentFolder };
+  const data = await fetch("https://localhost:7082/api/file/getFiles", {
+    method: "POST",
     headers: {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${jwtToken}`,
     },
+    body: JSON.stringify(payload),
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -15,23 +18,21 @@ export const getFiles = async () => {
   return data;
 };
 
-export const uploadFile = async (fileSelected, folderPath) => {
+export const uploadFile = async (fileSelected, folderPath, currentFolderId) => {
   const jwtToken = localStorage.getItem("jwtToken");
   if (fileSelected) {
     const formData = new FormData();
     formData.append("file", fileSelected);
-    formData.append("folder", folderPath);
+    formData.append("folderPath", folderPath);
+    formData.append("parentFolderId", currentFolderId);
 
-    const data = await fetch(
-      "https://localhost:7082/api/fileupload/uploadFiles",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-        },
-        body: formData,
-      }
-    ).then((response) => {
+    const data = await fetch("https://localhost:7082/api/file/uploadFiles", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      body: formData,
+    }).then((response) => {
       //handle response
       console.log("Response is");
       if (response.ok) {

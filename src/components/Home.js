@@ -2,8 +2,12 @@ import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../context/userContext";
 import "../css/Home.css";
 import { Modal, Button, Form } from "react-bootstrap";
-import { getFiles, uploadFile } from "../services/fileService";
-import { createFolder, getFolderDetails } from "../services/fileService";
+import {
+  getFiles,
+  uploadFile,
+  createFolder,
+  getFolderDetails,
+} from "../services/fileService";
 
 function Home() {
   const [viewType, setViewType] = useState("All");
@@ -17,7 +21,7 @@ function Home() {
   const [fileSelected, setFileSelected] = useState(null);
   const [currentFolderId, setCurrentFolderId] = useState(null);
 
-  // const files = [
+  // const filesAndFolders = [
   //   { name: "File1.txt", modified: "2024-06-04", type: "File", size: "15KB" },
   //   { name: "Folder1", modified: "2024-06-02", type: "Folder", size: "15KB" },
   //   { name: "File2.txt", modified: "2024-06-03", type: "File", size: "15KB" },
@@ -29,6 +33,7 @@ function Home() {
       const folderDetails = await getFolderDetails("home");
       setCurrentFolderId(folderDetails.id);
       setCurrentFolder(folderDetails.folderName);
+      callGetFiles();
     };
     getHomeFolderDetails();
   }, []);
@@ -64,7 +69,7 @@ function Home() {
   };
 
   const callUploadFile = async () => {
-    const data = await uploadFile(fileSelected, currentFolder);
+    const data = await uploadFile(fileSelected, currentFolder, currentFolderId);
     if (data === null) {
       alert("Could not upload file");
     }
@@ -72,7 +77,7 @@ function Home() {
   };
 
   const callGetFiles = async () => {
-    const data = await getFiles();
+    const data = await getFiles(currentFolder);
     setFilesFetched(data);
   };
 
