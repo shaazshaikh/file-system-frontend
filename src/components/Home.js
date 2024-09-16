@@ -3,7 +3,7 @@ import { UserContext } from "../context/userContext";
 import "../css/Home.css";
 import { Modal, Button, Form } from "react-bootstrap";
 import {
-  getFiles,
+  getFolderContents,
   uploadFile,
   createFolder,
   getFolderDetails,
@@ -17,7 +17,7 @@ function Home() {
   const [showModal, setShowModal] = useState(false);
   // const [isFolderCreation, setIsFolderCreation] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
-  const [filesFetched, setFilesFetched] = useState([]);
+  const [folderContentsFetched, setFolderContentsFetched] = useState([]);
   const [fileSelected, setFileSelected] = useState(null);
   const [currentFolderId, setCurrentFolderId] = useState(null);
 
@@ -30,18 +30,26 @@ function Home() {
 
   useEffect(() => {
     const getHomeFolderDetails = async () => {
-      const folderDetails = await getFolderDetails("home");
-      setCurrentFolderId(folderDetails.id);
-      setCurrentFolder(folderDetails.folderName);
-      callGetFiles();
+      return getFolderDetails(currentFolder).then((folderDetails) => {
+        setCurrentFolderId(folderDetails.id);
+        setCurrentFolder(folderDetails.folderName);
+      });
     };
     getHomeFolderDetails();
   }, []);
 
-  const files = [];
+  useEffect(() => {
+    if (currentFolderId) {
+      callGetFolderContents();
+    }
+  }, [currentFolderId]);
 
-  const filteredFiles =
-    viewType === "All" ? files : files.filter((file) => file.type === viewType);
+  // const files = [];
+
+  const filteredContents =
+    viewType === "All"
+      ? folderContentsFetched
+      : folderContentsFetched.filter((content) => content.type === viewType);
 
   const CallShowModal = () => setShowModal(true);
   const CallCloseModal = () => setShowModal(false);
@@ -76,9 +84,9 @@ function Home() {
     CallCloseModal();
   };
 
-  const callGetFiles = async () => {
-    const data = await getFiles(currentFolder);
-    setFilesFetched(data);
+  const callGetFolderContents = async () => {
+    const data = await getFolderContents(currentFolderId);
+    setFolderContentsFetched(data);
   };
 
   const fileChange = (event) => {
@@ -148,13 +156,13 @@ function Home() {
             </tr>
           </thead>
           <tbody>
-            {filteredFiles.map((file, index) => {
+            {filteredContents.map((folderContent, index) => {
               return (
                 <tr key={index}>
-                  <td>{file.name}</td>
-                  <td>{file.modified}</td>
-                  <td>{file.type}</td>
-                  <td>{file.size}</td>
+                  <td>{folderContent.name}</td>
+                  <td>{folderContent.modified}</td>
+                  <td>{folderContent.type}</td>
+                  <td>{folderContent.size}</td>
                   <td>⋮</td>
                 </tr>
               );

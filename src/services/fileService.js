@@ -1,14 +1,14 @@
-export const getFiles = async (currentFolder) => {
+export const getFolderContents = async (currentFolderId) => {
   const jwtToken = localStorage.getItem("jwtToken");
-  const payload = { folderPath: currentFolder };
-  const data = await fetch("https://localhost:7082/api/file/getFiles", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${jwtToken}`,
-    },
-    body: JSON.stringify(payload),
-  }).then((response) => {
+  const data = await fetch(
+    `https://localhost:7082/api/folderContent/getFolderContents/${currentFolderId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }
+  ).then((response) => {
     if (response.ok) {
       return response.json();
     } else {
@@ -73,10 +73,10 @@ export const createFolder = async (
   });
 };
 
-export const getFolderDetails = async (home) => {
+export const getFolderDetails = async (currentFolder) => {
   const jwtToken = localStorage.getItem("jwtToken");
   const response = await fetch(
-    `https://localhost:7082/api/folder/getFolderDetails/${home}`,
+    `https://localhost:7082/api/folder/getFolderDetails/${currentFolder}`,
     {
       method: "GET",
       headers: {
