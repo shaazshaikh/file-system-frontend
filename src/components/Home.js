@@ -65,10 +65,19 @@ function Home() {
     CallShowModal();
   };
 
-  const createNewFolder = () => {
+  const createNewFolder = async () => {
     if (newFolder) {
       const newFolderPath = `${currentFolder}/${newFolder}`;
-      const data = createFolder(currentFolderId, newFolderPath, newFolder);
+      const data = await createFolder(
+        currentFolderId,
+        newFolderPath,
+        newFolder
+      );
+      if (data === null) {
+        alert("Could not create folder");
+      } else {
+        await callGetFolderContents();
+      }
       setNewFolder("");
       CallCloseModal();
     } else {
@@ -77,11 +86,21 @@ function Home() {
   };
 
   const callUploadFile = async () => {
-    const data = await uploadFile(fileSelected, currentFolder, currentFolderId);
-    if (data === null) {
-      alert("Could not upload file");
+    if (fileSelected) {
+      const data = await uploadFile(
+        fileSelected,
+        currentFolder,
+        currentFolderId
+      );
+      if (data === null) {
+        alert("Could not upload file");
+      } else {
+        await callGetFolderContents();
+      }
+      CallCloseModal();
+    } else {
+      alert("Enter file name");
     }
-    CallCloseModal();
   };
 
   const callGetFolderContents = async () => {
@@ -160,7 +179,7 @@ function Home() {
               return (
                 <tr key={index}>
                   <td>{folderContent.name}</td>
-                  <td>{folderContent.modified}</td>
+                  <td>{folderContent.modifiedDate}</td>
                   <td>{folderContent.type}</td>
                   <td>{folderContent.size}</td>
                   <td>⋮</td>

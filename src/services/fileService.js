@@ -20,30 +20,25 @@ export const getFolderContents = async (currentFolderId) => {
 
 export const uploadFile = async (fileSelected, folderPath, currentFolderId) => {
   const jwtToken = localStorage.getItem("jwtToken");
-  if (fileSelected) {
-    const formData = new FormData();
-    formData.append("file", fileSelected);
-    formData.append("folderPath", folderPath);
-    formData.append("parentFolderId", currentFolderId);
+  const formData = new FormData();
+  formData.append("file", fileSelected);
+  formData.append("folderPath", folderPath);
+  formData.append("parentFolderId", currentFolderId);
 
-    const data = await fetch("https://localhost:7082/api/file/uploadFiles", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
-      body: formData,
-    }).then((response) => {
-      //handle response
-      console.log("Response is");
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Failed to upload");
-      }
-    });
-    return data;
+  const data = await fetch("https://localhost:7082/api/file/uploadFiles", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${jwtToken}`,
+    },
+    body: formData,
+  });
+
+  if (!data.ok) {
+    throw new Error("File upload failed");
   }
-  return null;
+
+  const response = await data.json;
+  return response;
 };
 
 export const createFolder = async (
@@ -68,9 +63,8 @@ export const createFolder = async (
       },
       body: JSON.stringify(payload),
     }
-  ).then((response) => {
-    return response;
-  });
+  );
+  return response;
 };
 
 export const getFolderDetails = async (currentFolder) => {
