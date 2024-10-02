@@ -124,3 +124,29 @@
   text-align: center;
   cursor: pointer;
 }
+
+.dropdown-menu {
+  font-style: normal !important;
+  color: black !important;
+  background-color: #f1f1f1 !important;
+  display: block !important;
+  position: absolute !important;
+  z-index: 1 !important;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2) !important;
+  padding: 12px 16px !important;
+}
+
+.dropdown-menu button {
+  display: block !important;
+  background: none !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  text-align: left !important;
+  width: 100% !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+}
+
+.dropdown-menu button:hover {
+  background-color: #ddd !important;
+}

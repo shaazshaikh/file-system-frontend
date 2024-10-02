@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { UserContext } from "../context/userContext";
 import "../css/Home.css";
 import { Modal, Button, Form } from "react-bootstrap";
@@ -21,12 +21,20 @@ function Home() {
   const [fileSelected, setFileSelected] = useState(null);
   const [currentFolderId, setCurrentFolderId] = useState(null);
 
-  // const filesAndFolders = [
-  //   { name: "File1.txt", modified: "2024-06-04", type: "File", size: "15KB" },
-  //   { name: "Folder1", modified: "2024-06-02", type: "Folder", size: "15KB" },
-  //   { name: "File2.txt", modified: "2024-06-03", type: "File", size: "15KB" },
-  //   { name: "Folder2", modified: "2024-06-01", type: "Folder", size: "15KB" },
-  // ];
+  const dropdownRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenMenuIndex(null); // Close the dropdown if clicking outside
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const getHomeFolderDetails = async () => {
@@ -111,6 +119,20 @@ function Home() {
   const fileChange = (event) => {
     setFileSelected(event.target.files[0]);
   };
+  const [openMenuIndex, setOpenMenuIndex] = useState(null);
+
+  const toggleMenu = (index) => {
+    setOpenMenuIndex(openMenuIndex === index ? null : index);
+  };
+
+  const handleDownload = (fileName) => {
+    alert(`Download - ${fileName}`);
+  };
+
+  const handleDelete = (fileName) => {
+    alert(`Delete ${fileName}`);
+  };
+
   return (
     <div className="home-container">
       <div className="sidebar">
@@ -182,7 +204,32 @@ function Home() {
                   <td>{folderContent.modifiedDate}</td>
                   <td>{folderContent.type}</td>
                   <td>{folderContent.size}</td>
-                  <td>⋮</td>
+                  <td>
+                    <div>
+                      <span
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          toggleMenu(index);
+                        }}
+                      >
+                        ⋮
+                      </span>
+                      {openMenuIndex === index && (
+                        <div ref={dropdownRef} className="dropdown-menu">
+                          <button
+                            onClick={() => handleDownload(folderContent.name)}
+                          >
+                            Download
+                          </button>
+                          <button
+                            onClick={() => handleDelete(folderContent.name)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               );
             })}
