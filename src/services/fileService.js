@@ -18,27 +18,47 @@ export const getFolderContents = async (currentFolderId) => {
   return data;
 };
 
-export const uploadFile = async (fileSelected, folderPath, currentFolderId) => {
+export const uploadFileInChunks = async (
+  fileSelected,
+  folderPath,
+  currentFolderId,
+  chunkSize = 5 * 1024 * 1024
+) => {
   const jwtToken = localStorage.getItem("jwtToken");
   const formData = new FormData();
-  formData.append("file", fileSelected);
-  formData.append("folderPath", folderPath);
-  formData.append("parentFolderId", currentFolderId);
+  const totalNumberOfChunks = Math.ceil(fileSelected.size / chunkSize);
 
-  const data = await fetch("https://localhost:7082/api/file/uploadFiles", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${jwtToken}`,
-    },
-    body: formData,
-  });
+  for (let index = 0; index < totalNumberOfChunks; index++) {
+    const start = index * chunkSize;
+    const end = Math.min(start + chunkSize, fileSelected.size);
+    const chunk = fileSelected.slice(start, end);
 
-  if (!data.ok) {
-    throw new Error("File upload failed");
+    formData.append("fileChunk", chunk);
+    formData.append("folderPath", folderPath);
+    formData.append("parentFolderId", currentFolderId);
+    formData.append("chunkIndex", index);
+    formData.append("totalNumberOfChunks", totalNumberOfChunks);
+    formData.append("totalFileSize", fileSelected.size);
+
+    const data = await fetch(
+      "https://localhost:7082/api/file/uploadFilesInChunks",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+        body: formData,
+      }
+    );
+
+    if (!data.ok) {
+      throw new Error("File upload failed");
+    }
+
+    // const response = await data.json;
+    // return response;
   }
-
-  const response = await data.json;
-  return response;
+  console.log("File uploaded successfully in chunks");
 };
 
 export const createFolder = async (
