@@ -4,7 +4,7 @@ import "../css/Home.css";
 import { Modal, Button, Form } from "react-bootstrap";
 import {
   getFolderContents,
-  uploadFile,
+  uploadFileInChunks,
   createFolder,
   getFolderDetails,
 } from "../services/fileService";
@@ -95,7 +95,7 @@ function Home() {
 
   const callUploadFile = async () => {
     if (fileSelected) {
-      const data = await uploadFile(
+      const data = await uploadFileInChunks(
         fileSelected,
         currentFolder,
         currentFolderId
