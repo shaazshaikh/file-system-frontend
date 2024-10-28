@@ -22,23 +22,30 @@ export const uploadFileInChunks = async (
   fileSelected,
   folderPath,
   currentFolderId,
-  chunkSize = 5 * 1024 * 1024
+  chunkSize = 1024 * 1024
 ) => {
   const jwtToken = localStorage.getItem("jwtToken");
-  const formData = new FormData();
+
   const totalNumberOfChunks = Math.ceil(fileSelected.size / chunkSize);
+  const fileBlobId = crypto.randomUUID();
+  const fileName = fileSelected.name;
+  const fileExtension = fileName.substring(fileName.lastIndexOf("."));
 
   for (let index = 0; index < totalNumberOfChunks; index++) {
     const start = index * chunkSize;
     const end = Math.min(start + chunkSize, fileSelected.size);
     const chunk = fileSelected.slice(start, end);
 
+    const formData = new FormData();
     formData.append("fileChunk", chunk);
     formData.append("folderPath", folderPath);
     formData.append("parentFolderId", currentFolderId);
     formData.append("chunkIndex", index);
     formData.append("totalNumberOfChunks", totalNumberOfChunks);
     formData.append("totalFileSize", fileSelected.size);
+    formData.append("fileBlobId", fileBlobId);
+    formData.append("fileName", fileName);
+    formData.append("fileExtension", fileExtension);
 
     const data = await fetch(
       "https://localhost:7082/api/file/uploadFilesInChunks",
