@@ -7,6 +7,7 @@ import {
   uploadFileInChunks,
   createFolder,
   getFolderDetails,
+  downloadFile,
 } from "../services/fileService";
 
 function Home() {
@@ -125,8 +126,8 @@ function Home() {
     setOpenMenuIndex(openMenuIndex === index ? null : index);
   };
 
-  const handleDownload = (fileName) => {
-    alert(`Download - ${fileName}`);
+  const handleDownload = async (fileUri) => {
+    await downloadFile(fileUri);
   };
 
   const handleDelete = (fileName) => {
@@ -217,7 +218,9 @@ function Home() {
                       {openMenuIndex === index && (
                         <div ref={dropdownRef} className="dropdown-menu">
                           <button
-                            onClick={() => handleDownload(folderContent.name)}
+                            onClick={() =>
+                              handleDownload(folderContent.fileDownloadUri)
+                            }
                           >
                             Download
                           </button>

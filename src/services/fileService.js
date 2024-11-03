@@ -94,6 +94,37 @@ export const createFolder = async (
   return response;
 };
 
+export const downloadFile = async (fileDownloadUri) => {
+  try {
+    const fileUrl = new URL(fileDownloadUri);
+    const relativeFilePath = fileUrl.pathname.split("/").slice(2).join("/");
+    const jwtToken = localStorage.getItem("jwtToken");
+    const response = await fetch(
+      `https://localhost:7082/api/file/getSASUrl?filePath=${encodeURIComponent(
+        relativeFilePath
+      )}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to generate SASLink");
+    }
+
+    const data = await response.json();
+    const link = document.createElement("a");
+    link.href = data;
+    link.download = fileUrl.pathname.split("/").pop();
+    link.click();
+  } catch (error) {
+    console.error("Error downloading file", error);
+  }
+};
+
 export const getFolderDetails = async (currentFolder) => {
   const jwtToken = localStorage.getItem("jwtToken");
   const response = await fetch(
