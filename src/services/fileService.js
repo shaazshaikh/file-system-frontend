@@ -125,10 +125,30 @@ export const downloadFile = async (fileDownloadUri) => {
   }
 };
 
-export const getFolderDetails = async (currentFolder) => {
+export const getDetailsOfHomeFolder = async (currentFolder) => {
   const jwtToken = localStorage.getItem("jwtToken");
   const response = await fetch(
-    `https://localhost:7082/api/folder/getFolderDetails/${currentFolder}`,
+    `https://localhost:7082/api/folder/getHomeFolderDetails/${currentFolder}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }
+  );
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else {
+    throw new Error("Failed to get folder details");
+  }
+};
+
+export const getDetailsOfFolder = async (folderId) => {
+  const jwtToken = localStorage.getItem("jwtToken");
+  const response = await fetch(
+    `https://localhost:7082/api/folder/getFolderDetails/${folderId}`,
     {
       method: "GET",
       headers: {

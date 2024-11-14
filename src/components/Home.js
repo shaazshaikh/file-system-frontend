@@ -6,7 +6,8 @@ import {
   getFolderContents,
   uploadFileInChunks,
   createFolder,
-  getFolderDetails,
+  getDetailsOfHomeFolder,
+  getDetailsOfFolder,
   downloadFile,
 } from "../services/fileService";
 
@@ -14,10 +15,12 @@ function Home() {
   const [viewType, setViewType] = useState("All");
   const { user, loading } = useContext(UserContext);
   const [currentFolder, setCurrentFolder] = useState("home");
+  const [folderPath, setFolderPath] = useState("home");
   const [newFolder, setNewFolder] = useState("");
   const [showModal, setShowModal] = useState(false);
   // const [isFolderCreation, setIsFolderCreation] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [folderDetails, setFolderDetails] = useState(null);
   const [folderContentsFetched, setFolderContentsFetched] = useState([]);
   const [fileSelected, setFileSelected] = useState(null);
   const [currentFolderId, setCurrentFolderId] = useState(null);
@@ -39,7 +42,8 @@ function Home() {
 
   useEffect(() => {
     const getHomeFolderDetails = async () => {
-      return getFolderDetails(currentFolder).then((folderDetails) => {
+      return getDetailsOfHomeFolder(currentFolder).then((folderDetails) => {
+        setFolderDetails(folderDetails);
         setCurrentFolderId(folderDetails.id);
         setCurrentFolder(folderDetails.folderName);
       });
@@ -76,7 +80,7 @@ function Home() {
 
   const createNewFolder = async () => {
     if (newFolder) {
-      const newFolderPath = `${currentFolder}/${newFolder}`;
+      const newFolderPath = `${folderDetails.folderPath}/${newFolder}`;
       const data = await createFolder(
         currentFolderId,
         newFolderPath,
@@ -134,6 +138,14 @@ function Home() {
     alert(`Delete ${fileName}`);
   };
 
+  const handleFolderClick = async (folder) => {
+    const folderDetails = await getDetailsOfFolder(folder.id);
+    setFolderDetails(folderDetails);
+    setCurrentFolderId(folder.id);
+    setCurrentFolder(folder.name);
+    setFolderPath(`${folderPath}/${folder.name}`);
+  };
+
   return (
     <div className="home-container">
       <div className="sidebar">
@@ -145,6 +157,7 @@ function Home() {
       </div>
       <div className="main-content">
         <div className="top-bar">
+          <div className="current-folder-box">{folderPath}</div>
           <button className="new-button" onClick={handleNewFolder}>
             + New Folder
           </button>
@@ -201,7 +214,14 @@ function Home() {
             {filteredContents.map((folderContent, index) => {
               return (
                 <tr key={index}>
-                  <td>{folderContent.name}</td>
+                  <td
+                    onClick={() => {
+                      folderContent.type.toLowerCase() === "folder" &&
+                        handleFolderClick(folderContent);
+                    }}
+                  >
+                    {folderContent.name}
+                  </td>
                   <td>{folderContent.modifiedDate}</td>
                   <td>{folderContent.type}</td>
                   <td>{folderContent.size}</td>
