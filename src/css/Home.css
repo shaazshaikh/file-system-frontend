@@ -34,10 +34,12 @@
 
 .top-bar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
   background-color: none;
+  gap: 10px;
 }
 
 .new-button {
@@ -149,4 +151,37 @@
 
 .dropdown-menu button:hover {
   background-color: #ddd !important;
+}
+
+.current-folder-box {
+  display: block;
+  margin-top: 1%;
+  margin-bottom: 1%;
+  padding: 1%;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: rgb(58, 40, 188);
+  background-color: #ecf0f1;
+  border-left: 0.5% solid #3498db;
+  border-radius: 0.5%;
+}
+
+.back-container {
+  display: flex;
+  align-items: center;
+  margin-top: 1%;
+  margin-bottom: 1%;
+}
+
+.back-button {
+  background-color: transparent;
+  border: none;
+  color: #3498db;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-right: 1%;
+}
+
+.back-button:hover {
+  text-decoration: underline;
 }
