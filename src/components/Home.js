@@ -42,10 +42,10 @@ function Home() {
 
   useEffect(() => {
     const getHomeFolderDetails = async () => {
-      return getDetailsOfHomeFolder(currentFolder).then((folderDetails) => {
-        setFolderDetails(folderDetails);
-        setCurrentFolderId(folderDetails.id);
-        setCurrentFolder(folderDetails.folderName);
+      return getDetailsOfHomeFolder(currentFolder).then((detailsOfFolder) => {
+        setFolderDetails(detailsOfFolder);
+        setCurrentFolderId(detailsOfFolder.id);
+        setCurrentFolder(detailsOfFolder.folderName);
       });
     };
     getHomeFolderDetails();
@@ -102,7 +102,7 @@ function Home() {
     if (fileSelected) {
       const data = await uploadFileInChunks(
         fileSelected,
-        currentFolder,
+        folderPath,
         currentFolderId
       );
       if (data === null) {
@@ -138,12 +138,27 @@ function Home() {
     alert(`Delete ${fileName}`);
   };
 
+  // const sampleFunction = () => {
+  //   console.log("Inside sampleFunction");
+  // };
+
   const handleFolderClick = async (folder) => {
-    const folderDetails = await getDetailsOfFolder(folder.id);
-    setFolderDetails(folderDetails);
+    const detailsOfFolder = await getDetailsOfFolder(folder.id);
+    // const detailsOfFolder1 = await sampleFunction();
+    setFolderDetails(detailsOfFolder);
     setCurrentFolderId(folder.id);
     setCurrentFolder(folder.name);
-    setFolderPath(`${folderPath}/${folder.name}`);
+    setFolderPath(`${detailsOfFolder.folderPath}`);
+  };
+
+  const handleBackClick = async () => {
+    const detailsOfFolder = await getDetailsOfFolder(
+      folderDetails.parentFolderId
+    );
+    setFolderDetails(detailsOfFolder);
+    setCurrentFolderId(detailsOfFolder.id);
+    setCurrentFolder(detailsOfFolder.folderName);
+    setFolderPath(`${detailsOfFolder.folderPath}`);
   };
 
   return (
@@ -157,7 +172,6 @@ function Home() {
       </div>
       <div className="main-content">
         <div className="top-bar">
-          <div className="current-folder-box">{folderPath}</div>
           <button className="new-button" onClick={handleNewFolder}>
             + New Folder
           </button>
@@ -200,6 +214,14 @@ function Home() {
             )}
           </div>
         </div>
+        {folderPath !== "home" && (
+          <div className="back-container">
+            <button className="back-button" onClick={handleBackClick}>
+              Back
+            </button>
+          </div>
+        )}
+        <div className="current-folder-box">{folderPath}</div>
         <table className="files-folders-table">
           <thead>
             <tr>
