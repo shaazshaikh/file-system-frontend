@@ -1,6 +1,9 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { UserContext } from "../context/userContext";
 import "../css/Home.css";
+import VideoPlayer from "./VideoPlayer";
+import "../css/VideoPlayer.css";
+import { Download, Play, Trash, X } from "lucide-react";
 import { Modal, Button, Form } from "react-bootstrap";
 import {
   getFolderContents,
@@ -9,7 +12,9 @@ import {
   getDetailsOfHomeFolder,
   getDetailsOfFolder,
   downloadFile,
+  getStreamingPath,
 } from "../services/fileService";
+import videojs from "video.js";
 
 function Home() {
   const [viewType, setViewType] = useState("All");
@@ -18,14 +23,56 @@ function Home() {
   const [folderPath, setFolderPath] = useState("home");
   const [newFolder, setNewFolder] = useState("");
   const [showModal, setShowModal] = useState(false);
-  // const [isFolderCreation, setIsFolderCreation] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [folderDetails, setFolderDetails] = useState(null);
   const [folderContentsFetched, setFolderContentsFetched] = useState([]);
   const [fileSelected, setFileSelected] = useState(null);
   const [currentFolderId, setCurrentFolderId] = useState(null);
-
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const dropdownRef = useRef(null);
+
+  const playerRef = useRef(null);
+  const [videoLink, setVideoLink] = useState("");
+  const videoPlayerOptions = {
+    controls: true,
+    responsive: true,
+    fluid: true,
+    sources: [
+      {
+        src: videoLink,
+        type: "application/x-mpegURL",
+      },
+    ],
+  };
+
+  const handlePlayerReady = (player) => {
+    playerRef.current = player;
+
+    const srcUrl = player.currentSource().src;
+    const sasToken = srcUrl.includes("?") ? srcUrl.substring(srcUrl.indexOf("?")) : "";
+
+    if (player.tech({ IWillNotUseThisInPlugins: true }).vhs) {
+      player.tech({ IWillNotUseThisInPlugins: true }).vhs.xhr.beforeRequest =
+        function (reqOptions) {
+          if (
+            (reqOptions.uri.endsWith(".ts") || reqOptions.uri.endsWith(".m3u8")) &&
+            sasToken
+          ) {
+            if (!reqOptions.uri.includes("?")) {
+              reqOptions.uri += sasToken;
+            }
+          }
+          return reqOptions;
+        };
+    }
+
+    player.on("waiting", () => {
+      videojs.log("player is waiting");
+    });
+    player.on("dispose", () => {
+      videojs.log("player will dispose");
+    });
+  };
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -56,8 +103,6 @@ function Home() {
       callGetFolderContents();
     }
   }, [currentFolderId]);
-
-  // const files = [];
 
   const filteredContents =
     viewType === "All"
@@ -124,11 +169,7 @@ function Home() {
   const fileChange = (event) => {
     setFileSelected(event.target.files[0]);
   };
-  const [openMenuIndex, setOpenMenuIndex] = useState(null);
-
-  const toggleMenu = (index) => {
-    setOpenMenuIndex(openMenuIndex === index ? null : index);
-  };
+  const [, setOpenMenuIndex] = useState(null);
 
   const handleDownload = async (fileUri) => {
     await downloadFile(fileUri);
@@ -138,13 +179,19 @@ function Home() {
     alert(`Delete ${fileName}`);
   };
 
-  // const sampleFunction = () => {
-  //   console.log("Inside sampleFunction");
-  // };
+  const downloadStreamingPath = async (fileId) => {
+    const streamingLink = await getStreamingPath(fileId);
+    setVideoLink(streamingLink);
+    setShowVideoPlayer(true);
+  };
+
+  const closePlayer = () => {
+    setShowVideoPlayer(false);
+    setVideoLink("");
+  }
 
   const handleFolderClick = async (folder) => {
     const detailsOfFolder = await getDetailsOfFolder(folder.id);
-    // const detailsOfFolder1 = await sampleFunction();
     setFolderDetails(detailsOfFolder);
     setCurrentFolderId(folder.id);
     setCurrentFolder(folder.name);
@@ -161,15 +208,26 @@ function Home() {
     setFolderPath(`${detailsOfFolder.folderPath}`);
   };
 
+  const videoExtensions = [".mp4", ".avi", ".mov", ".mkv"];
+  const isItVideoFile = (fileName) => {
+    return videoExtensions.some((extension) =>
+      fileName.toLowerCase().endsWith(extension)
+    );
+  };
+
   return (
     <div className="home-container">
-      <div className="sidebar">
+      {/* <div>
+        <h1>Video Player</h1>
+        <VideoPlayer options={videoPlayerOptions} onReady={handlePlayerReady} />
+      </div> */}
+      {/* <div className="sidebar">
         <ul>
           <li>Home</li>
           <li>Trash</li>
           <li>Storage</li>
         </ul>
-      </div>
+      </div> */}
       <div className="main-content">
         <div className="top-bar">
           <button className="new-button" onClick={handleNewFolder}>
@@ -208,7 +266,6 @@ function Home() {
           <div className="top-right-icons">
             {!loading && user && (
               <>
-                <div className="settings-icon">⚙️</div>
                 <div className="profile-icon">{user[0].toUpperCase()}</div>
               </>
             )}
@@ -248,31 +305,37 @@ function Home() {
                   <td>{folderContent.type}</td>
                   <td>{folderContent.size}</td>
                   <td>
-                    <div>
-                      <span
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          toggleMenu(index);
+                    <div style={{ display: "flex", gap: "10px" }}>
+                      <Download
+                        size={18}
+                        style={{ cursor: "pointer" }}
+                        title="Download"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDownload(folderContent.fileDownloadUri);
                         }}
-                      >
-                        ⋮
-                      </span>
-                      {openMenuIndex === index && (
-                        <div ref={dropdownRef} className="dropdown-menu">
-                          <button
-                            onClick={() =>
-                              handleDownload(folderContent.fileDownloadUri)
-                            }
-                          >
-                            Download
-                          </button>
-                          <button
-                            onClick={() => handleDelete(folderContent.name)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
+                      />
+                      <Trash
+                        size={18}
+                        style={{ cursor: "pointer", color: "red" }}
+                        title="Delete"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(folderContent.name);
+                        }}
+                      />
+                      {folderContent.type.toLowerCase() === "file" &&
+                        isItVideoFile(folderContent.name) && (
+                          <Play
+                            size={18}
+                            style={{ cursor: "pointer", color: "green" }}
+                            title="Play"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              downloadStreamingPath(folderContent.id);
+                            }}
+                          />
+                        )}
                     </div>
                   </td>
                 </tr>
@@ -281,7 +344,14 @@ function Home() {
           </tbody>
         </table>
       </div>
-
+      {showVideoPlayer && (
+        <div className="video-overlay">
+          <div style={{position: "relative", width: "70%", maxWidth: "900px"}}>
+            <X size={28} style={{position: "absolute", top: "-40px", right: "-40px", cursor: "pointer", color: "white"}} onClick={closePlayer}/>
+            <VideoPlayer options={videoPlayerOptions} onReady={handlePlayerReady}/>
+          </div>
+        </div>
+      )}
       <Modal show={showModal} onHide={CallCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>
