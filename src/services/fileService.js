@@ -164,3 +164,23 @@ export const getDetailsOfFolder = async (folderId) => {
     throw new Error("Failed to get folder details");
   }
 };
+
+export const getStreamingPath = async (fileId) => {
+  const jwtToken = localStorage.getItem("jwtToken");
+  var response = await fetch(
+    `https://localhost:7082/api/file/getStreamingPath/${fileId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }
+  );
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else {
+    throw new Error("Failed to get streaming path");
+  }
+};
